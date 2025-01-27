@@ -1,5 +1,5 @@
 import OpenAI from "openai";
-import ProductService from "./productService";
+import ProductService, { Invoice } from "./productService";
 
 const SYSTEM_MESSAGE = [
   "You are a sales manager for for a clothing online store.",
@@ -7,10 +7,10 @@ const SYSTEM_MESSAGE = [
   "Follow the following routine with the user:",
   "1. First, introduce yourself and ask the user what they are looking for. Suggest product categories from existing products.",
   "2. Propose a product.",
-  "3. IF the user is satisfied, remember the selected product",
+  "3. IF the user is satisfied, remember the selected product with its id",
   "4. Ask if the user needs more products",
   "5. IF the user needs more products, repeat step 2",
-  "6. ONLY IF the user confirmed that he is done, place the order and give him a summary of his selections with the total price",
+  "6. ONLY IF the user confirmed that he is done (really make sure by asking for confirmation if the user is done shopping), place the order by calling create_order with the corrects ids and counts and give him a summary of his selections with the total price",
   "",
 ];
 
@@ -42,8 +42,9 @@ const TOOLS: OpenAI.ChatCompletionTool[] = [
               description: "item with product id and count",
               properties: {
                 id: {
-                  type: "number",
-                  description: "id of the product",
+                  type: "string",
+                  description:
+                    "id of the product. id is obtained from get_all_products",
                 },
                 count: {
                   type: "number",
@@ -63,6 +64,21 @@ const TOOLS: OpenAI.ChatCompletionTool[] = [
   },
 ];
 
+enum ACTION_TYPES {
+  CONTINUE_CHAT,
+  RETURN_INVOICE,
+}
+
+type RETURN_INVOICE = {
+  type: ACTION_TYPES.RETURN_INVOICE;
+  invoice: Invoice;
+};
+
+type CONTINUE_CHAT = {
+  type: ACTION_TYPES.CONTINUE_CHAT;
+  chatCompletion: OpenAI.ChatCompletion;
+};
+
 class ChatGPTService {
   private client: OpenAI;
 
@@ -74,75 +90,70 @@ class ChatGPTService {
 
   public async callOpenAi(
     msgs: OpenAI.ChatCompletionMessageParam[]
-  ): Promise<OpenAI.ChatCompletion> {
+  ): Promise<CONTINUE_CHAT | RETURN_INVOICE> {
     let messages: OpenAI.ChatCompletionMessageParam[] = msgs;
+    console.log(
+      "calling openai with last message",
+      messages?.[messages.length - 1] || "no message"
+    );
     const chatCompletion = await this.client.chat.completions.create({
       messages: messages,
-      model: "gpt-4o-mini",
+      model: "gpt-4o",
       tools: TOOLS,
     });
-    if (chatCompletion.choices[0].message.tool_calls?.length) {
-      messages = [
-        ...messages,
-        {
-          role: "assistant",
-          tool_calls: chatCompletion.choices[0].message.tool_calls,
-        },
-      ];
-      const toolCallMessages = await this.handleToolCalls(
-        chatCompletion.choices[0].message.tool_calls
-      );
-      messages = [...messages, ...toolCallMessages];
+    const toolCalls = chatCompletion.choices[0].message.tool_calls;
+    if (toolCalls?.length) {
+      messages.push({
+        role: "assistant",
+        tool_calls: chatCompletion.choices[0].message.tool_calls,
+      });
+
+      for (const toolCall of toolCalls) {
+        const productService = new ProductService();
+        switch (toolCall.function.name) {
+          case "get_all_products":
+            const products = productService.getAllProducts();
+            messages.push({
+              role: "tool",
+              content: JSON.stringify(products),
+              tool_call_id: toolCall.id,
+            });
+            continue;
+          case "create_order":
+            const invoice = productService.createOrder(
+              JSON.parse(toolCall.function.arguments)?.items
+            );
+            return { type: ACTION_TYPES.RETURN_INVOICE, invoice };
+          default:
+            throw new Error(`Unknown function: ${toolCall.function.name}`);
+        }
+      }
+
       return await this.callOpenAi(messages);
     }
-    return chatCompletion;
+    return { type: ACTION_TYPES.CONTINUE_CHAT, chatCompletion };
   }
 
   public async getResponse(
     message?: string,
     history?: OpenAI.ChatCompletionMessageParam[]
-  ): Promise<OpenAI.ChatCompletionMessageParam[]> {
+  ): Promise<{
+    messages?: OpenAI.ChatCompletionMessageParam[];
+    invoice?: Invoice;
+  }> {
     let messages: OpenAI.ChatCompletionMessageParam[] = message
       ? [...this.initHistory(history), { role: "user", content: message }]
       : this.initHistory(history);
 
-    const chatCompletion = await this.callOpenAi(messages);
-    return this.processResponse(chatCompletion, history, message);
-  }
-
-  private async handleToolCalls(
-    toolCalls: OpenAI.ChatCompletionMessageToolCall[]
-  ): Promise<OpenAI.ChatCompletionMessageParam[]> {
-    const messages = [];
-    for (const toolCall of toolCalls) {
-      const result = await this.executeToolCall(toolCall);
-      const resultMessage: OpenAI.ChatCompletionToolMessageParam = {
-        role: "tool",
-        content: result,
-        tool_call_id: toolCall.id,
+    const result = await this.callOpenAi(messages);
+    if (result.type === ACTION_TYPES.CONTINUE_CHAT) {
+      return {
+        messages: this.processResponse(result.chatCompletion, history, message),
       };
-      messages.push(resultMessage);
-    }
-    return messages;
-  }
-
-  private async executeToolCall(
-    toolCall: OpenAI.ChatCompletionMessageToolCall
-  ): Promise<string> {
-    console.log("executing tool call", toolCall);
-    const productService = new ProductService();
-    switch (toolCall.function.name) {
-      case "get_all_products":
-        const products = productService.getAllProducts();
-        return JSON.stringify(products);
-      case "create_order":
-        console.log(JSON.parse(toolCall.function.arguments)?.items);
-        const invoice = productService.createOrder(
-          JSON.parse(toolCall.function.arguments)?.items
-        );
-        return JSON.stringify(invoice);
-      default:
-        throw new Error(`Unknown function: ${toolCall.function.name}`);
+    } else if (result.type === ACTION_TYPES.RETURN_INVOICE) {
+      return { invoice: result.invoice };
+    } else {
+      throw new Error("Unexpected result type");
     }
   }
 

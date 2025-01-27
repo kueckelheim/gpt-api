@@ -1,24 +1,44 @@
 <div id="chat-container">
-  <div id="chat-messages">
-    {{#each messages}}
-      <div class="message {{this.role}}">
-        <p>{{{markdown this.content}}}</p>
-      </div>
-    {{/each}}
-  </div>
-  <form
-    id="chat-form"
-    action="/postMessage"
-    method="POST"
-    onsubmit="this.querySelector('button').disabled = true;"
-  >
-    <input
-      type="text"
-      id="chat-input"
-      name="message"
-      placeholder="Type your message here..."
-    />
-    <input type="hidden" name="history" value="{{json messages}}" />
-    <button type="submit">Send</button>
-  </form>
+  {{#if messages}}
+    <div id="chat-messages">
+      {{#each messages}}
+        <div class="message {{this.role}}">
+          <p>{{{markdown this.content}}}</p>
+        </div>
+      {{/each}}
+    </div>
+    <form
+      id="chat-form"
+      action="/postMessage"
+      method="POST"
+      onsubmit="this.querySelector('button').disabled = true;"
+    >
+      <input
+        type="text"
+        id="chat-input"
+        name="message"
+        placeholder="Type your message here..."
+      />
+      <input type="hidden" name="history" value="{{json messages}}" />
+      <button type="submit">Send</button>
+    </form>
+  {{else if invoice}}
+    <div id="invoice">
+      <strong>Thank you for your purchase!</strong>
+
+      <h2>Invoice #{{invoice.id}}</h2>
+      <ul>
+        {{#each invoice.items}}
+          <li>
+            <strong>{{this.product.name}}</strong>
+            -
+            {{this.count}}
+            x ${{this.product.price}}
+          </li>
+        {{/each}}
+      </ul>
+      <hr />
+      <p><strong>Total:</strong> ${{invoice.total}}</p>
+    </div>
+  {{/if}}
 </div>

@@ -5,7 +5,7 @@ const productsFilePath = path.join(__dirname, "products.json");
 const ordersFilePath = path.join(__dirname, "orders.json");
 
 interface Product {
-  id: number;
+  id: string;
   name: string;
   price: number;
   description: string;
@@ -13,11 +13,11 @@ interface Product {
 }
 
 interface OrderItem {
-  id: number;
+  id: string;
   count: number;
 }
 
-interface Invoice {
+export interface Invoice {
   id: number;
   items: { product: Product; count: number }[];
   total: number;
@@ -42,7 +42,7 @@ class ProductService {
     return this.products;
   }
 
-  public getProductById(id: number): Product | undefined {
+  public getProductById(id: string): Product | undefined {
     return this.products.find((product) => product.id === id);
   }
 
@@ -55,9 +55,10 @@ class ProductService {
       return { product, count: item.count };
     });
 
-    const total = invoiceItems.reduce(
-      (sum, item) => sum + item.product.price * item.count,
-      0
+    const total = Number(
+      invoiceItems
+        .reduce((sum, item) => sum + item.product.price * item.count, 0)
+        .toFixed(2)
     );
 
     const invoice: Invoice = {
