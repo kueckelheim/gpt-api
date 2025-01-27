@@ -22,5 +22,7 @@ build/
 .vscode/
 .idea/
 
+/src/services/orders.json
+
 # MacOS specific files
 .DS_Store

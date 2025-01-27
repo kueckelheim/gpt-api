@@ -10,7 +10,7 @@ const SYSTEM_MESSAGE = [
   "3. IF the user is satisfied, remember the selected product",
   "4. Ask if the user needs more products",
   "5. IF the user needs more products, repeat step 2",
-  "6. IF the user is done, give him a summary of his selections with the total price",
+  "6. ONLY IF the user confirmed that he is done, place the order and give him a summary of his selections with the total price",
   "",
 ];
 
@@ -21,6 +21,43 @@ const TOOLS: OpenAI.ChatCompletionTool[] = [
       name: "get_all_products",
       description:
         "Get a list of all available products in the store. Each product has an id, name, price, description and gender.",
+      strict: false,
+    },
+  },
+  {
+    type: "function",
+    function: {
+      name: "create_order",
+      parameters: {
+        type: "object",
+        description:
+          "object containing an array of items. you will need the ids of the products that you obtain from get_all_products",
+        properties: {
+          items: {
+            type: "array",
+            description: "array of objects for each item",
+            minItems: 1,
+            items: {
+              type: "object",
+              description: "item with product id and count",
+              properties: {
+                id: {
+                  type: "number",
+                  description: "id of the product",
+                },
+                count: {
+                  type: "number",
+                  description: "desired quantity of the product",
+                },
+              },
+              required: ["id", "count"],
+            },
+          },
+        },
+        required: ["items"],
+      },
+      description:
+        "The createOrder function receives an array of objects with product IDs and counts, creates an invoice in JSON format, stores it in orders.json, and returns the invoice JSON.",
       strict: false,
     },
   },
@@ -93,11 +130,17 @@ class ChatGPTService {
     toolCall: OpenAI.ChatCompletionMessageToolCall
   ): Promise<string> {
     console.log("executing tool call", toolCall);
+    const productService = new ProductService();
     switch (toolCall.function.name) {
       case "get_all_products":
-        const productService = new ProductService();
         const products = productService.getAllProducts();
         return JSON.stringify(products);
+      case "create_order":
+        console.log(JSON.parse(toolCall.function.arguments)?.items);
+        const invoice = productService.createOrder(
+          JSON.parse(toolCall.function.arguments)?.items
+        );
+        return JSON.stringify(invoice);
       default:
         throw new Error(`Unknown function: ${toolCall.function.name}`);
     }
