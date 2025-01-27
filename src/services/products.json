@@ -1,0 +1,156 @@
+[
+  {
+    "id": 1,
+    "name": "T-Shirt",
+    "price": 19.99,
+    "description": "A comfortable cotton t-shirt",
+    "gender": "female"
+  },
+  {
+    "id": 2,
+    "name": "Jeans",
+    "price": 49.99,
+    "description": "Stylish blue jeans",
+    "gender": "male"
+  },
+  {
+    "id": 3,
+    "name": "Sneakers",
+    "price": 59.99,
+    "description": "Comfortable running sneakers",
+    "gender": "unisex"
+  },
+  {
+    "id": 4,
+    "name": "Jacket",
+    "price": 89.99,
+    "description": "Warm winter jacket",
+    "gender": "female"
+  },
+  {
+    "id": 5,
+    "name": "Hat",
+    "price": 14.99,
+    "description": "Stylish summer hat",
+    "gender": "unisex"
+  },
+  {
+    "id": 6,
+    "name": "Socks",
+    "price": 5.99,
+    "description": "Comfortable cotton socks",
+    "gender": "unisex"
+  },
+  {
+    "id": 7,
+    "name": "Dress",
+    "price": 39.99,
+    "description": "Elegant evening dress",
+    "gender": "female"
+  },
+  {
+    "id": 8,
+    "name": "Shorts",
+    "price": 24.99,
+    "description": "Casual summer shorts",
+    "gender": "male"
+  },
+  {
+    "id": 9,
+    "name": "Sweater",
+    "price": 34.99,
+    "description": "Cozy wool sweater",
+    "gender": "female"
+  },
+  {
+    "id": 10,
+    "name": "Belt",
+    "price": 19.99,
+    "description": "Leather belt",
+    "gender": "unisex"
+  },
+  {
+    "id": 11,
+    "name": "Scarf",
+    "price": 12.99,
+    "description": "Warm wool scarf",
+    "gender": "unisex"
+  },
+  {
+    "id": 12,
+    "name": "Gloves",
+    "price": 9.99,
+    "description": "Winter gloves",
+    "gender": "unisex"
+  },
+  {
+    "id": 13,
+    "name": "Watch",
+    "price": 199.99,
+    "description": "Luxury wrist watch",
+    "gender": "unisex"
+  },
+  {
+    "id": 14,
+    "name": "Sunglasses",
+    "price": 29.99,
+    "description": "Stylish sunglasses",
+    "gender": "unisex"
+  },
+  {
+    "id": 15,
+    "name": "Backpack",
+    "price": 49.99,
+    "description": "Durable travel backpack",
+    "gender": "unisex"
+  },
+  {
+    "id": 16,
+    "name": "Sandals",
+    "price": 19.99,
+    "description": "Comfortable summer sandals",
+    "gender": "unisex"
+  },
+  {
+    "id": 17,
+    "name": "Cap",
+    "price": 14.99,
+    "description": "Baseball cap",
+    "gender": "unisex"
+  },
+  {
+    "id": 18,
+    "name": "Blouse",
+    "price": 29.99,
+    "description": "Elegant silk blouse",
+    "gender": "female"
+  },
+  {
+    "id": 19,
+    "name": "Tie",
+    "price": 19.99,
+    "description": "Silk tie",
+    "gender": "male"
+  },
+  {
+    "id": 20,
+    "name": "Boots",
+    "price": 79.99,
+    "description": "Leather boots",
+    "gender": "unisex"
+  },
+  {
+    "id": 21,
+    "name": "Skirt",
+    "price": 34.99,
+    "description": "Pleated skirt",
+    "gender": "female"
+  },
+  {
+    "id": 22,
+    "name": "Coat",
+    "price": 99.99,
+    "description": "Woolen coat",
+    "gender": "female"
+  }
+]

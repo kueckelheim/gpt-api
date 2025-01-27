@@ -1,2 +1,9 @@
 <h1>Welcome to the Home Page</h1>
 <p>This is the main content of the home page.</p>
+
+<h2>Product List</h2>
+<ul>
+  {{#each products}}
+    <li>{{this.name}} - ${{this.price}}: {{this.description}}</li>
+  {{/each}}
+</ul>
