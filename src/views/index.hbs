@@ -1,5 +1,22 @@
-<h1>Welcome to the Home Page</h1>
-<p>This is the main content of the home page.</p>
+<h2>Chat</h2>
+<div id="chat-container">
+  <div id="chat-messages">
+    {{#each messages}}
+      <div class="message {{this.sender}}">
+        <p>{{this.text}}</p>
+      </div>
+    {{/each}}
+  </div>
+  <form id="chat-form" action="/postMessage" method="POST">
+    <input
+      type="text"
+      id="chat-input"
+      name="message"
+      placeholder="Type your message here..."
+    />
+    <button type="submit">Send</button>
+  </form>
+</div>
 
 <h2>Product List</h2>
 <ul>

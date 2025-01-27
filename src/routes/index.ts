@@ -7,4 +7,5 @@ const indexController = new IndexController();
 export function setRoutes(app: any) {
     app.use('/', router);
     router.get('/', indexController.getIndex.bind(indexController));
+    router.post('/postMessage', indexController.postMessage.bind(indexController)); // Add this line
 }

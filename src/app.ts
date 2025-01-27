@@ -1,3 +1,6 @@
+import dotenv from "dotenv";
+// Load environment variables from .env file
+dotenv.config();
 import express from "express";
 import { engine } from "express-handlebars";
 import { setRoutes } from "./routes/index";
@@ -20,7 +23,7 @@ app.set("views", "./src/views");
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('src/public')); // Serve static files from the 'public' directory
+app.use(express.static("src/public")); // Serve static files from the 'public' directory
 
 // Set up routes
 setRoutes(app);
