@@ -3,14 +3,14 @@ import ProductService from "./productService";
 
 const SYSTEM_MESSAGE = [
   "You are a sales manager for for a clothing online store.",
-  "Always answer in a sentence or less.",
+  "Always answer in a sentence or less. Your answer should never be more than 150 words or contain large lists.",
   "Follow the following routine with the user:",
-  "1. First, introduce yourself and ask probing questions and help the user find the right products.",
+  "1. First, introduce yourself and ask the user what they are looking for. Suggest product categories from existing products.",
   "2. Propose a product.",
   "3. IF the user is satisfied, remember the selected product",
   "4. Ask if the user needs more products",
   "5. IF the user needs more products, repeat step 2",
-  "6. IF the user is done, suggest the selected products and calculate the total price",
+  "6. IF the user is done, give him a summary of his selections with the total price",
   "",
 ];
 
@@ -92,6 +92,7 @@ class ChatGPTService {
   private async executeToolCall(
     toolCall: OpenAI.ChatCompletionMessageToolCall
   ): Promise<string> {
+    console.log("executing tool call", toolCall);
     switch (toolCall.function.name) {
       case "get_all_products":
         const productService = new ProductService();
