@@ -6,9 +6,8 @@ const chatGPTService = new ChatGPTService();
 
 export class IndexController {
   public async getIndex(req: any, res: any): Promise<void> {
-    const products = productService.getAllProducts();
     const initialHistory = await chatGPTService.getResponse();
-    res.render("index", { title: "Home", products, messages: initialHistory });
+    res.render("index", { title: "Home", messages: initialHistory });
   }
 
   public async postMessage(req: any, res: any): Promise<void> {

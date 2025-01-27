@@ -39,10 +39,9 @@ class ChatGPTService {
     msgs: OpenAI.ChatCompletionMessageParam[]
   ): Promise<OpenAI.ChatCompletion> {
     let messages: OpenAI.ChatCompletionMessageParam[] = msgs;
-    console.log("callOpenAi called", messages);
     const chatCompletion = await this.client.chat.completions.create({
       messages: messages,
-      model: "gpt-4o",
+      model: "gpt-4o-mini",
       tools: TOOLS,
     });
     if (chatCompletion.choices[0].message.tool_calls?.length) {
@@ -53,7 +52,6 @@ class ChatGPTService {
           tool_calls: chatCompletion.choices[0].message.tool_calls,
         },
       ];
-      console.log("tool calls: ", chatCompletion.choices[0].message.tool_calls);
       const toolCallMessages = await this.handleToolCalls(
         chatCompletion.choices[0].message.tool_calls
       );
@@ -72,7 +70,6 @@ class ChatGPTService {
       : this.initHistory(history);
 
     const chatCompletion = await this.callOpenAi(messages);
-    console.log(chatCompletion);
     return this.processResponse(chatCompletion, history, message);
   }
 
