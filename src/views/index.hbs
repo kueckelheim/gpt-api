@@ -3,7 +3,7 @@
   <div id="chat-messages">
     {{#each messages}}
       <div class="message {{this.sender}}">
-        <p>{{this.text}}</p>
+        <p>{{{markdown this.text}}}</p>
       </div>
     {{/each}}
   </div>

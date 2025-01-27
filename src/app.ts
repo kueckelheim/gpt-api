@@ -4,6 +4,7 @@ dotenv.config();
 import express from "express";
 import { engine } from "express-handlebars";
 import { setRoutes } from "./routes/index";
+import { marked } from "marked";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,7 @@ app.engine(
     layoutsDir: "./src/views", // Specify the layouts directory
     helpers: {
       json: (context: any) => JSON.stringify(context),
+      markdown: (text: string) => marked(text),
     },
   })
 );
