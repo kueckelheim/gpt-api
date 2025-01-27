@@ -5,14 +5,15 @@ const productService = new ProductService();
 const chatGPTService = new ChatGPTService();
 
 export class IndexController {
-  public getIndex(req: any, res: any): void {
+  public async getIndex(req: any, res: any): Promise<void> {
     const products = productService.getAllProducts();
-    res.render("index", { title: "Home", products, messages: [] });
+    const initialHistory = await chatGPTService.getResponse();
+    res.render("index", { title: "Home", products, messages: initialHistory });
   }
 
   public async postMessage(req: any, res: any): Promise<void> {
     const userMessage = req.body.message;
-    const history = JSON.parse(req.body.history || "[]");
+    const history = JSON.parse(req.body.history);
     const updatedHistory = await chatGPTService.getResponse(
       userMessage,
       history
