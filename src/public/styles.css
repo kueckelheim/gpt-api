@@ -50,7 +50,8 @@ footer {
     background-color: #e1ffc7;
 }
 
-.message.bot {
+.message.assistant,
+.message.system {
     text-align: left;
     background-color: #f1f1f1;
 }

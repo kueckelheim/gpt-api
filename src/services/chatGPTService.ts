@@ -9,10 +9,22 @@ class ChatGPTService {
     });
   }
 
-  public async getResponse(message: string): Promise<string> {
+  public async getResponse(
+    message: string,
+    history: Array<{ role: string; content: string }>
+  ): Promise<Array<{ role: string; content: string }>> {
+    console.log(message, history);
     const chatCompletion = await this.client.chat.completions.create({
-      messages: [{ role: "user", content: message }],
-      model: "gpt-4o",
+      messages: [
+        ...history.map((msg) => ({
+          role: ["system", "user", "assistant"].includes(msg.role)
+            ? (msg.role as "system" | "user" | "assistant")
+            : "user",
+          content: msg.content,
+        })),
+        { role: "user", content: message },
+      ],
+      model: "gpt-4",
     });
 
     if (
@@ -20,7 +32,13 @@ class ChatGPTService {
       chatCompletion.choices[0] &&
       chatCompletion.choices[0].message
     ) {
-      return chatCompletion.choices[0]?.message?.content?.trim() || "";
+      const botMessage =
+        chatCompletion.choices[0].message.content?.trim() || "";
+      return [
+        ...history,
+        { role: "user", content: message },
+        { role: "assistant", content: botMessage },
+      ];
     }
     throw new Error("No response from chat completion");
   }

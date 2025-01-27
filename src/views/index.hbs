@@ -2,8 +2,8 @@
 <div id="chat-container">
   <div id="chat-messages">
     {{#each messages}}
-      <div class="message {{this.sender}}">
-        <p>{{{markdown this.text}}}</p>
+      <div class="message {{this.role}}">
+        <p>{{{markdown this.content}}}</p>
       </div>
     {{/each}}
   </div>
