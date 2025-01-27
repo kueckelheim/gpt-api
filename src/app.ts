@@ -15,6 +15,9 @@ app.engine(
     extname: ".hbs",
     defaultLayout: "layout", // Set the default layout to 'layout.hbs'
     layoutsDir: "./src/views", // Specify the layouts directory
+    helpers: {
+      json: (context: any) => JSON.stringify(context),
+    },
   })
 );
 app.set("view engine", "hbs");

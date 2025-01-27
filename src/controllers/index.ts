@@ -12,8 +12,18 @@ export class IndexController {
 
   public async postMessage(req: any, res: any): Promise<void> {
     const userMessage = req.body.message;
+    const history = JSON.parse(req.body.history || "[]");
     const botResponse = await chatGPTService.getResponse(userMessage);
     const products = productService.getAllProducts();
-    res.render("index", { title: "Home", products, messages: [{ sender: "user", text: userMessage }, { sender: "bot", text: botResponse }] });
+    const messages = [
+      ...history,
+      { sender: "user", text: userMessage },
+      { sender: "bot", text: botResponse },
+    ];
+    res.render("index", {
+      title: "Home",
+      products,
+      messages,
+    });
   }
 }
